@@ -11,13 +11,13 @@ npm i idb2promise
 ## CDN
 
 ```html
-<script defer src="https://raw.githubusercontent.com/Costamilam/IDB2Promise/build/idb2promise.js"></script>
+<script defer src="https://raw.githubusercontent.com/Costamilam/IDB2Promise/master/build/idb2promise.js"></script>
 ```
 
 Or minified and uglified
 
 ```html
-<script defer src="https://raw.githubusercontent.com/Costamilam/IDB2Promise/build/idb2promise.min.js"></script>
+<script defer src="https://raw.githubusercontent.com/Costamilam/IDB2Promise/master/build/idb2promise.min.js"></script>
 ```
 
 ## Use with TypeScript
@@ -207,3 +207,5 @@ storage.iterate()
         showInfoMessage('All data loaded');
     })
 ```
+
+The writers methods in the iteration item don't use Promises, they are the native API

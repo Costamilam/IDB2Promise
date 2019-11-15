@@ -1,11 +1,11 @@
 {
     "name": "idb2promise",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "TypeScript library to manage IndexedDB Storage",
     "main": "src/main.ts",
     "scripts": {
-        "build": "npm run build:no-min && npm run build:min",
-        "build:no-min": "node_modules/.bin/rollup -c rollup.config.js --environment BUILD:development",
+        "deploy": "npm run build && npm run build:min && git push origin master && npm publish",
+        "build": "node_modules/.bin/rollup -c rollup.config.js --environment BUILD:development",
         "build:min": "node_modules/.bin/rollup -c rollup.config.js --environment INCLUDE_DEPS,BUILD:minify",
         "test": "export CHROME_BIN=chromium-browser && karma start"
     },
