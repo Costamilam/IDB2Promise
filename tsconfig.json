@@ -1,0 +1,22 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "module": "none",
+        "removeComments": true,
+        "sourceMap": true,
+        "target": "es6",
+        "outFile": "./build/simple-idb.js"
+    },
+    "lib": [
+        "es2015.promise"
+    ],
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "src/intefaces/*.*",
+        "src/idb-event.ts",
+        "src/main.ts",
+        "src/test.ts"
+    ]
+}
