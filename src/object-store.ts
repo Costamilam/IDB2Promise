@@ -3,7 +3,7 @@ import { DatabaseConnection } from "./database-connection";
 import { Request } from "./util/request";
 import { AsyncCursor } from "./util/async-cursor";
 
-export abstract class ObjectStore<Type> extends DatabaseConnection {
+export abstract class ObjectStore<Type = any> extends DatabaseConnection {
 
     constructor() {
         super();
@@ -56,20 +56,6 @@ export abstract class ObjectStore<Type> extends DatabaseConnection {
     index(name: string): Request<IDBIndex> {
         return new Request<IDBIndex>(this.getReadableOnly().then(storage => storage.index(name)));
     }
-
-    // getAllIndex(): Promise<IDBIndex[]> {
-    //     // const names = await this.getAllIndexNames();
-
-    //     // return Promise.all(
-    //     //     this.getAllIndexNames()
-    //     //         .then(indexNames => indexNames.map(this.getIndex))
-    //     // )
-
-    //     return new Promise((resolve, reject) => {
-    //         this.getAllIndexNames()
-    //             .then(names => Promise.all(names.map(this.getIndex)).then(resolve).catch(reject));
-    //     });
-    // }
 
     getIndexNames(): Request<string[]> {
         return new Request<string[] | DOMStringList>(this.getReadableOnly().then(storage => storage.indexNames))

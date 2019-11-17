@@ -1,13 +1,16 @@
 {
     "name": "idb2promise",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "description": "TypeScript library to manage IndexedDB Storage",
-    "main": "src/main.ts",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
     "scripts": {
-        "deploy": "npm run build && npm run build:min && git push origin master && npm publish",
-        "build": "node_modules/.bin/rollup -c rollup.config.js --environment BUILD:development",
+        "deploy": "npm run build:ts && npm run build:js && npm run build:min && npm publish",
+        "build:ts": "node_modules/.bin/tsc -b",
+        "build:js": "node_modules/.bin/rollup -c rollup.config.js --environment BUILD:development",
         "build:min": "node_modules/.bin/rollup -c rollup.config.js --environment INCLUDE_DEPS,BUILD:minify",
-        "test": "export CHROME_BIN=chromium-browser && karma start"
+        "test": "karma start",
+        "test:chromium": "export CHROME_BIN=chromium-browser && karma start"
     },
     "keywords": [
         "javascript",
@@ -17,7 +20,7 @@
     ],
     "author": "Guilherme Costamilam",
     "license": "ISC",
-    "dependencies": {},
+    "dependencies": { },
     "devDependencies": {
         "@types/es6-promise": "^3.3.0",
         "@types/jasmine": "^3.4.6",

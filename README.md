@@ -11,13 +11,13 @@ npm i idb2promise
 ## CDN
 
 ```html
-<script defer src="https://raw.githubusercontent.com/Costamilam/IDB2Promise/master/build/idb2promise.js"></script>
+<script defer src="https://unpkg.com/idb2promise@<version>/dist/idb2promise.js"></script>
 ```
 
 Or minified and uglified
 
 ```html
-<script defer src="https://raw.githubusercontent.com/Costamilam/IDB2Promise/master/build/idb2promise.min.js"></script>
+<script defer src="https://unpkg.com/idb2promise@<version>/dist/idb2promise.min.js"></script>
 ```
 
 ## Use with TypeScript
@@ -192,7 +192,7 @@ Two methods return a `AsyncCursor` with 3 methods:
 
 Example:
 
-```JavaScript
+```javascript
 storage.iterate()
     .each(function(item) {
         return isOld(item.value) ? item.delete() && false : item

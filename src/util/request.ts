@@ -3,7 +3,7 @@ import { RequestEvent } from "./request-event";
 export class Request<Type> extends Promise<Type> {
 
     constructor(
-        request: Promise<IDBRequest<Type> | Type>
+        request: Promise<IDBRequest<Type> | Type> | Function
     ) {
         super((resolve, reject) => {
             if (request instanceof Function) {

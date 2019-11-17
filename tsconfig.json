@@ -1,22 +1,20 @@
 {
     "compileOnSave": false,
     "compilerOptions": {
-        "module": "none",
+        "module": "commonjs",
         "removeComments": true,
         "sourceMap": true,
-        "target": "es6",
-        "outFile": "./build/simple-idb.js"
+        "target": "es5",
+        "declaration": true,
+        "outDir": "./dist"
     },
     "lib": [
         "es2015.promise"
     ],
     "include": [
-        "src/**/*"
+        "src/**/*.ts"
     ],
     "exclude": [
-        "src/intefaces/*.*",
-        "src/idb-event.ts",
-        "src/main.ts",
         "src/test.ts"
     ]
 }

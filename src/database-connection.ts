@@ -6,7 +6,7 @@ export abstract class DatabaseConnection {
 
     abstract readonly objectStoreOptions: IDBObjectStoreParameters;
 
-    abstract readonly dBName: string = 'AppDatabase';
+    readonly dBName: string = 'AppDatabase';
 
     private dBVersion?: number = undefined;
 
