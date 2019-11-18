@@ -1,9 +1,12 @@
 {
     "name": "idb2promise",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "TypeScript library to manage IndexedDB Storage",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
+    "files": [
+        "./dist"
+    ],
     "scripts": {
         "deploy": "npm run build:ts && npm run build:js && npm run build:min && npm publish",
         "build:ts": "node_modules/.bin/tsc -b",
@@ -20,6 +23,14 @@
     ],
     "author": "Guilherme Costamilam",
     "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Costamilam/IDB2Promise.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Costamilam/IDB2Promise/issues"
+    },
+    "homepage": "https://costamilam.github.io/IDB2Promise/",  
     "dependencies": { },
     "devDependencies": {
         "@types/es6-promise": "^3.3.0",
