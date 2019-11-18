@@ -1,4 +1,4 @@
-import { RequestEvent } from "./util/request-event";
+import { RequestEvent } from './util/request-event';
 
 export abstract class DatabaseConnection {
 

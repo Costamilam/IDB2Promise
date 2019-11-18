@@ -1,4 +1,4 @@
-import { RequestEvent } from "./request-event";
+import { RequestEvent } from './request-event';
 
 export class Request<Type> extends Promise<Type> {
 

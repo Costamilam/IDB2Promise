@@ -1,6 +1,6 @@
 {
     "name": "idb2promise",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "TypeScript library to manage IndexedDB Storage",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -19,7 +19,7 @@
         "indexeddb"
     ],
     "author": "Guilherme Costamilam",
-    "license": "ISC",
+    "license": "MIT",
     "dependencies": { },
     "devDependencies": {
         "@types/es6-promise": "^3.3.0",

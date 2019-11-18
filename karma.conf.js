@@ -66,7 +66,7 @@ module.exports = function (config) {
 
         // TypeScript configuration
         karmaTypescriptConfig: {
-            tsconfig: "./test.tsconfig.json",
+            tsconfig: './test.tsconfig.json',
         }
     })
 }

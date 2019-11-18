@@ -1,7 +1,7 @@
-import { DatabaseConnection } from "./database-connection";
+import { DatabaseConnection } from './database-connection';
 
-import { Request } from "./util/request";
-import { AsyncCursor } from "./util/async-cursor";
+import { Request } from './util/request';
+import { AsyncCursor } from './util/async-cursor';
 
 export abstract class ObjectStore<Type = any> extends DatabaseConnection {
 
