@@ -1,12 +1,9 @@
 {
     "name": "idb2promise",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "TypeScript library to manage IndexedDB Storage",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
-    "files": [
-        "./dist"
-    ],
     "scripts": {
         "deploy": "npm run build:ts && npm run build:js && npm run build:min && npm publish",
         "build:ts": "node_modules/.bin/tsc -b",
