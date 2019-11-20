@@ -1,6 +1,6 @@
 {
     "name": "idb2promise",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "TypeScript library to manage IndexedDB Storage",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -30,7 +30,7 @@
     "bugs": {
         "url": "https://github.com/Costamilam/IDB2Promise/issues"
     },
-    "homepage": "https://costamilam.github.io/IDB2Promise/",  
+    "homepage": "https://costamilam.github.io/IDB2Promise/",
     "dependencies": { },
     "devDependencies": {
         "@types/es6-promise": "^3.3.0",
