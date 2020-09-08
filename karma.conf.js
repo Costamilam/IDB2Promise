@@ -16,8 +16,7 @@ module.exports = function (config) {
         // list of files / patterns to load in the browser
         files: [
             'src/**/*.ts',
-            'test/**/*.ts',
-            'test/**/*spec.ts'
+            'test/**/*.ts'
         ],
 
         // list of files / patterns to exclude
@@ -45,7 +44,7 @@ module.exports = function (config) {
 
         // level of logging
         // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-        logLevel: config.LOG_DEBUG,
+        logLevel: config.LOG_WARN,
 
         // enable / disable watching file and executing tests whenever any file changes
         autoWatch: true,
@@ -64,9 +63,31 @@ module.exports = function (config) {
         // how many browser should be started simultaneous
         concurrency: Infinity,
 
+        client: {
+            jasmine: {
+                random: false
+            }
+        },
+
         // TypeScript configuration
         karmaTypescriptConfig: {
-            tsconfig: './test.tsconfig.json',
+            compileOnSave: true,
+            compilerOptions: {
+                module: 'commonjs',
+                esModuleInterop: false,
+                removeComments: false,
+                sourceMap: true,
+                target: 'es5',
+                declaration: false
+            },
+            lib: [
+                'es2015'
+            ],
+            include: [
+                'src/**/*.ts',
+                'test/**/*.ts'
+            ],
+            exclude: []
         }
     })
 }

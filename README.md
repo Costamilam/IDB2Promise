@@ -23,7 +23,7 @@ Or minified and uglified
 ## Use with TypeScript
 
 ```typescript
-import { ObjectStore } from 'IDB2Promise';
+import { ObjectStore, IndexDefinition } from 'IDB2Promise';
 
 class Example {
     constructor(
@@ -32,15 +32,20 @@ class Example {
 }
 
 class ExampleStorage extends ObjectStore<Example> {
+    readonly databaseName: string = 'AppDB';
+
     readonly objectStoreName: string = 'Example';
 
     readonly objectStoreOptions: IDBObjectStoreParameters = { autoIncrement: true };
 
-    readonly dBName: string = 'AppDB';
+    indexes: IndexDefinition[] = [{
+        name: 'byName',
+        keyPath: 'name'
+    }];
 }
 ```
 
-> `dBName` property is optionally, if is not defined, the default value is `'AppDatabase'`
+> `databaseName` property is optionally, if is not defined, the default value is `'AppDatabase'`
 
 You can use a base class to set database name:
 
@@ -49,7 +54,7 @@ import { ObjectStore } from 'IDB2Promise';
 import { ExampleOne, ExampleTwo } from './path/to/models'
 
 abstract class AppStorage<Type> extends ObjectStore<Type> {
-    readonly dBName: string = 'AppDB';
+    readonly databaseName: string = 'AppDB';
 }
 
 class ExampleStorageOne extends AppStorage<ExampleOne> {
@@ -81,34 +86,48 @@ function Example(name) {
 }
 
 function ExampleStorage() {
+    IDB2Promise.ObjectStore.apply(this, arguments);
+
+    this.databaseName = 'AppDB';
     this.objectStoreName = 'Example';
     this.objectStoreOptions = { autoIncrement: true };
-    this.dBName = 'AppDB';
+
+    this.indexes = [{
+        name: 'byName',
+        keyPath: 'name'
+    }];
 }
-ExampleStorage.prototype = IDB2Promise.ObjectStore;
+ExampleStorage.prototype = Object.create(IDB2Promise.ObjectStore.prototype);
+ExampleStorage.prototype.constructor = ExampleStorage;
 ```
 
-> `dBName` property is optionally, if is not defined, the default value is `'AppDatabase'`
+> `databaseName` property is optionally, if is not defined, the default value is `'AppDatabase'`
 
 You can use a base class to set database name:
 
 ```javascript
 function AppStorage() {
-    this.dBName = 'AppDB';
+    this.databaseName = 'AppDB';
 }
 AppStorage.prototype = IDB2Promise.ObjectStore;
 
 function ExampleStorageOne() {
+    IDB2Promise.ObjectStore.apply(this, arguments);
+
     this.objectStoreName = 'ExampleStorageOne';
     this.objectStoreOptions = { autoIncrement: true };
 }
-ExampleStorageOne.prototype = AppStorage;
+ExampleStorageOne.prototype = Object.create(IDB2Promise.ObjectStore.prototype);
+ExampleStorageOne.prototype.constructor = ExampleStorageOne;
 
 function ExampleStorageTwo() {
+    IDB2Promise.ObjectStore.apply(this, arguments);
+
     this.objectStoreName = 'ExampleStorageTwo';
     this.objectStoreOptions = { keyPath: 'name' };
 }
-ExampleStorageTwo.prototype = AppStorage;
+ExampleStorageTwo.prototype = Object.create(IDB2Promise.ObjectStore.prototype);
+ExampleStorageTwo.prototype.constructor = ExampleStorageTwo;
 ```
 
 After you instance the super class of `ObjectStore` and call your functions to manage database
@@ -117,32 +136,33 @@ After you instance the super class of `ObjectStore` and call your functions to m
 
 First, instance your `ObjectStore` super class
 
-```JavaScript
+```javascript
 var storage = new ExampleStorage();
-/* var or let or const */
 ```
 
 All methods, except iterators, has very semelhance with [native API](https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore), the parameters is equal but returns `IDBRequest.result` as a `Promise`
 
-### Indexes manager methods
+### Indexes manager
 
-```JavaScript
-storage.createIndex(name, keyPath, options);
+The creation, modification and deletion of the index are orchestrated internally, just change the `storage.indexes` property and call` storage.updateDB()` to execute the changes. if `storage.indexes` is not an array (or is not defined), change checks are ignored and no indexes are created, modified or deleted 
 
+### Indexes methods
+
+```javascript
 storage.index(name);
-
-storage.deleteIndex(name);
 ```
+
+The methods in the index don't use Promises, they are the native API
 
 Equivalent of property `IDBObjecStore.indexNames`:
 
-```JavaScript
-storage.getIndexNames();
+```javascript
+storage.indexNames();
 ```
 
 ### Writers methods
 
-```JavaScript
+```javascript
 storage.add(data, key);
 
 storage.put(data, key);
@@ -154,7 +174,7 @@ storage.clear();
 
 ### Readers methods
 
-```JavaScript
+```javascript
 storage.count();
 
 storage.get(key);
@@ -170,7 +190,7 @@ storage.getKey(query);
 
 Equivalent of method `IDBObjecStore.openCursor()`:
 
-```JavaScript
+```javascript
 storage.iterate(range, direction, readableOnly);
 ```
 
@@ -178,34 +198,33 @@ storage.iterate(range, direction, readableOnly);
 
 Equivalent of method `IDBObjecStore.openKeyCursor()`:
 
-```JavaScript
+```javascript
 storage.iterateKeys(query, direction);
 ```
 
-Two methods return a `AsyncCursor` with 3 methods:
-
- - `each`: push one success callback, you can add multiples callbacks to called in order in all iterations
-
- - `catch`: push one error callback, you can add multiples callbacks to called in order
-
- - `finally`: push one finally callback, it is called after all iterations and/or errors
-
-Example:
+Two methods return an `AsyncGenerator`, you can use with `for await...of` syntax:
 
 ```javascript
-storage.iterate()
-    .each(function(item) {
-        return isOld(item.value) ? item.delete() && false : item
-    })
-    .each(function(item) {
-        if (item !== false) pushItemInDOMList(item);
-    })
-    .catch(function(eventError) {
-        showErrorMessage('Load failed');
-    })
-    .finally(function() {
-        showInfoMessage('All data loaded');
-    })
+for await (const cursor of storage.iterate())
+    console.log(cursor);
 ```
 
-The writers methods in the iteration item don't use Promises, they are the native API
+Or recursion and promises:
+
+```javascript
+function asyncForeach(iterator, callback) {
+    iterator.next().then(function(cursor) {
+        if (!cursor.done) {
+            callback(cursor.value)
+
+            asyncForeach(iterator, callback);
+        }
+    });
+}
+
+asyncForeach(storage.iterate(), function(cursor) {
+    console.log(cursor);
+});
+```
+
+The methods in the iteration item don't use Promises, they are the native API

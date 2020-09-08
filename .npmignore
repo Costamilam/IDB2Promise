@@ -1,10 +1,17 @@
+# Source code
 src
 
+# Test code/config
 coverage
 test
 karma.conf.js
+test.tsconfig.json
 
+# Build config - Rollup
 rollup.config.js
 
+# Build config - TypeScript
 tsconfig.json
-test.tsconfig.json
+
+# GitPages config
+_config.yml

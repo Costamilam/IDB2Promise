@@ -1,52 +1,70 @@
-'use strict';
-
 import 'rollup';
-import typescript from 'rollup-plugin-typescript';
-import buble from 'rollup-plugin-buble';
-import commonjs from 'rollup-plugin-commonjs';
-import nodeResolve from 'rollup-plugin-node-resolve';
+import typescript from 'rollup-plugin-typescript2';
 import minify from 'rollup-plugin-babel-minify';
+import packageConfig from './package.json';
 
-// Default/development Build
-const config = {
-    input: 'src/index.ts',
-    external: [ ],
-    output: [{
-        name: 'IDB2Promise',
-        file: 'dist/idb2promise.js',
-        format: 'umd',
-        moduleName: 'IDB2Promise',
-        sourceMap: true,
-        exports: 'auto'
-    }],
-    plugins: [
-        typescript({
-            typescript: require('typescript')
-        }),
-        buble({
-            transforms: {
-                generator: false,
-                forOf: false
-            }
-        }),
-        nodeResolve({
-            mainFields: ['main']
-        }),
-        commonjs({
-            namedExports: { }
-        })
-    ]
+const type = process.env.BUILD;
+
+const outputFields = {
+    name: 'IDB2Promise',
+    moduleName: 'IDB2Promise',
+    sourceMap: false,
+    exports: 'auto'
 };
 
-// Minified JS Build
-if (process.env.BUILD === 'minify') {
-    config.output[0].file = 'dist/idb2promise.min.js';
+let output = [];
 
-    config.plugins.push(
-		minify({
+const plugins = [
+    typescript({
+        rollupCommonJSResolveHack: true,
+        clean: true,
+        module: 'es5',
+        tsconfigOverride: {
+            compilerOptions: {
+                declaration: true,
+                declarationDir: './dist'
+            },
+            include: [
+                'src/**/*.ts'
+            ]
+        }
+    })
+];
+
+if (type === 'js') {
+    output.push({
+        ...outputFields,
+        file: `dist/${packageConfig.name}.js`,
+        format: 'umd'
+    });
+} else if (type === 'min') {
+    output.push({
+        ...outputFields,
+        file: `dist/${packageConfig.name}.min.js`,
+        format: 'umd'
+    });
+
+    plugins.push(
+        minify({
             sourceMap: true
         })
     );
+} else {
+    output.push({
+        ...outputFields,
+        file: packageConfig.module,
+        format: 'es'
+    });
+
+    output.push({
+        ...outputFields,
+        file: packageConfig.main,
+        format: 'cjs'
+    });
 }
 
-export default config;
+export default {
+    input: 'src/main.ts',
+    output: output,
+    plugins: plugins
+};
