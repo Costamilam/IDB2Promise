@@ -1,7 +1,7 @@
-export function toPromise<Type>(request: Type | IDBRequest<Type>): Promise<Type> {
+export function toPromise<T>(request: T | IDBRequest<T>): Promise<T> {
     return new Promise((resolve, reject) => {
         if (request instanceof IDBRequest) {
-            request.onsuccess = (event: Event & { target: { result: Type } }) => resolve(event.target.result);
+            request.onsuccess = (event: Event & { target: { result: T } }) => resolve(event.target.result);
 
             request.onerror = event => reject(event);
         } else {
@@ -10,11 +10,11 @@ export function toPromise<Type>(request: Type | IDBRequest<Type>): Promise<Type>
     });
 }
 
-type toRecursivePromiseResult<Type> = Promise<{ cursor: Type, nextPromise: toRecursivePromiseResult<Type> }>
+type toRecursivePromiseResult<T> = Promise<{ cursor: T, nextPromise: toRecursivePromiseResult<T> }>
 
-function toRecursivePromise<Type extends (IDBCursor | IDBCursorWithValue)>(request: IDBRequest<Type | null>): toRecursivePromiseResult<Type> {
+function toRecursivePromise<T extends (IDBCursor | IDBCursorWithValue)>(request: IDBRequest<T | null>): toRecursivePromiseResult<T> {
     return new Promise((resolve, reject) => {
-        request.onsuccess = (event: Event & { target: { result: Type } }) => {
+        request.onsuccess = (event: Event & { target: { result: T } }) => {
             let cursor = event.target.result;
 
             resolve({ cursor, nextPromise: toRecursivePromise(request) });
@@ -24,7 +24,7 @@ function toRecursivePromise<Type extends (IDBCursor | IDBCursorWithValue)>(reque
     });
 }
 
-export async function* toAsyncGenerator<Type extends (IDBCursor | IDBCursorWithValue)>(request: Promise<IDBRequest<Type | null>>): AsyncGenerator<Type, null, void> {
+export async function* toAsyncGenerator<T extends (IDBCursor | IDBCursorWithValue)>(request: Promise<IDBRequest<T | null>>): AsyncGenerator<T, null, void> {
     let promise = toRecursivePromise(await request);
 
     while (true) {
@@ -33,9 +33,9 @@ export async function* toAsyncGenerator<Type extends (IDBCursor | IDBCursorWithV
         promise = nextPromise;
 
         if (cursor) {
-            cursor.continue();
-
             yield cursor;
+
+            cursor.continue();
         } else {
             return null
         }

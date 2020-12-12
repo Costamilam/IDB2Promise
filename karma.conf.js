@@ -77,12 +77,9 @@ module.exports = function (config) {
                 esModuleInterop: false,
                 removeComments: false,
                 sourceMap: true,
-                target: 'es5',
+                target: 'esnext',
                 declaration: false
             },
-            lib: [
-                'es2015'
-            ],
             include: [
                 'src/**/*.ts',
                 'test/**/*.ts'

@@ -18,33 +18,29 @@ describe('Data Writers:', () => {
         return Promise.all(data.map(storage.add.bind(storage)));
     });
 
-    it('add', () => {
-        return storage.add(new DemoOne('any'))
-            .then(async () => {
-                expect(await storage.count()).toEqual(data.length + 1);
-            });
+    it('add', async () => {
+        await storage.add(new DemoOne('any'));
+
+        expect(await storage.count()).toEqual(data.length + 1);
     });
 
-    it('put', () => {
-        const cahnged = new DemoOne('any');
+    it('put', async () => {
+        const changed = new DemoOne('any');
 
-        return storage.put(cahnged, 0)
-            .then(async () => {
-                expect((await storage.get(0)).foo).toEqual(cahnged.foo);
-            });
+        await storage.put(changed, 0);
+
+        expect((await storage.get(0)).foo).toEqual(changed.foo);
     });
 
-    it('delete', () => {
-        return storage.delete(0)
-            .then(async () => {
-                expect(await storage.count()).toEqual(data.length - 1);
-            });
+    it('delete', async () => {
+        await storage.delete(0);
+
+        expect(await storage.count()).toEqual(data.length - 1);
     });
 
-    it('clear', () => {
-        return storage.clear()
-            .then(async () => {
-                expect(await storage.count()).toEqual(0);
-            });
+    it('clear', async () => {
+        await storage.clear();
+
+        expect(await storage.count()).toEqual(0);
     });
 });

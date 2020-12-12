@@ -4,7 +4,16 @@ export class ConnectionsManager {
 
     private connections: Connection[] = [];
 
-    constructor() { }
+    private constructor() { }
+
+    static instance = null;
+
+    static getInstance() {
+        if (this.instance === null)
+            this.instance = new ConnectionsManager();
+
+        return this.instance
+    }
 
     getConnection(name: string): Connection {
         const index = this.connections.findIndex(connections => connections.name === name);

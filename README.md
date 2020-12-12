@@ -53,7 +53,7 @@ You can use a base class to set database name:
 import { ObjectStore } from 'IDB2Promise';
 import { ExampleOne, ExampleTwo } from './path/to/models'
 
-abstract class AppStorage<Type> extends ObjectStore<Type> {
+abstract class AppStorage<T> extends ObjectStore<T> {
     readonly databaseName: string = 'AppDB';
 }
 
@@ -144,7 +144,7 @@ All methods, except iterators, has very semelhance with [native API](https://dev
 
 ### Indexes manager
 
-The creation, modification and deletion of the index are orchestrated internally, just change the `storage.indexes` property and call` storage.updateDB()` to execute the changes. if `storage.indexes` is not an array (or is not defined), change checks are ignored and no indexes are created, modified or deleted 
+The creation, modification and deletion of the index are orchestrated internally, just change the `storage.indexes` property and call` storage.updateDB()` to execute the changes. if `storage.indexes` is an empty array, all indexes will be deleted. if `storage.indexes` is not an array (or is not defined), change checks are ignored and no indexes are created, modified or deleted 
 
 ### Indexes methods
 
@@ -154,7 +154,7 @@ storage.index(name);
 
 The methods in the index don't use Promises, they are the native API
 
-Equivalent of property `IDBObjecStore.indexNames`:
+Equivalent of property `IDBObjecStore.indexNames`, but returns as a Promise:
 
 ```javascript
 storage.indexNames();
@@ -228,3 +228,68 @@ asyncForeach(storage.iterate(), function(cursor) {
 ```
 
 The methods in the iteration item don't use Promises, they are the native API
+
+### Cutom methods
+
+Methost for manipulating storage using an filter of type [`Partial<T>`](https://www.typescriptlang.org/docs/handbook/utility-types.html#partialtype) or an function that receive the item and return an boolean, where `T` is same of `ObjectStore<T>`:
+
+```javascript
+/**
+ * @constructor
+ * @param {string} name
+ * @param {boolean} active
+*/
+function Example(name, active) {
+    this.name = name;
+    this.active = active;
+}
+
+/**
+ * @type Partial<Example>
+ * Equal to { name?: string, active?: boolean }
+*/
+var partialFilter = { active: true };
+
+/**
+ * @type (data: Example) => boolean
+*/
+var functionFilter = function(data) {
+    return data.active;
+};
+```
+
+Returns an `AsyncGenerator` with matched items, the same as in the [Iterators methods](#iterators-methods) section:
+
+```javascript
+storage.find(filter);
+```
+
+Returns the first occurrence of `storage.find()` or null:
+
+```javascript
+storage.findFirst(filter);
+```
+
+Update one or more items, passing the data or an function that returns the data to put:
+
+```javascript
+storage.update(filter, data);
+
+storage.update(filter, function(currentData) {
+    return Object.assign(newData, currentData);
+});
+
+storage.updateFirst(filter, data);
+
+storage.updateFirst(filter, function(currentData) {
+    return Object.assign(newData, currentData);
+});
+```
+
+Exclude one or more items:
+
+```javascript
+storage.exclude(filter);
+
+storage.excludeFirst(filter);
+```

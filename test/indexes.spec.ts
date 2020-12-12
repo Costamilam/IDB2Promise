@@ -23,22 +23,22 @@ describe('Index Manager:', () => {
         expect(list).toEqual(jasmine.arrayWithExactContents(storage.indexes.map(index => index.name)));
     });
 
-    it('create index', () => {
+    it('create index', async () => {
         storage.indexes.push({
             name: 'byBar',
             keyPath: ['bar']
         });
 
-        return storage.updateDB()
-            .then(() => storage.indexNames())
-            .then(indexes => expect(indexes).toEqual(jasmine.arrayWithExactContents(storage.indexes.map(index => index.name))));
+        await storage.updateDB();
+
+        expect(await storage.indexNames()).toEqual(jasmine.arrayWithExactContents(storage.indexes.map(index => index.name)));
     });
 
-    it('delete index', () => {
+    it('delete index', async () => {
         storage.indexes.pop();
 
-        return storage.updateDB()
-            .then(() => storage.indexNames())
-            .then(indexes => expect(indexes).toEqual(jasmine.arrayWithExactContents(storage.indexes.map(index => index.name))));
+        await storage.updateDB();
+
+        expect(await storage.indexNames()).toEqual(jasmine.arrayWithExactContents(storage.indexes.map(index => index.name)));
     });
 });

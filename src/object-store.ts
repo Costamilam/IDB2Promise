@@ -1,8 +1,11 @@
 import { Transaction } from './transaction';
 import { toPromise, toAsyncGenerator } from './utils/request-converter';
 import { IndexDefinition } from './intefaces/index-definition';
+import { include } from './utils/match';
 
-export abstract class ObjectStore<Type = any> {
+type filter<T> = Partial<T> | ((data: T) => boolean);
+
+export abstract class ObjectStore<T = any> {
 
     abstract readonly databaseName?: string;
 
@@ -22,16 +25,16 @@ export abstract class ObjectStore<Type = any> {
         return toPromise<number>(storage.count());
     }
 
-    async get(key: string | number | Date | ArrayBufferView | ArrayBuffer | IDBArrayKey | IDBKeyRange): Promise<Type> {
+    async get(key: string | number | Date | ArrayBufferView | ArrayBuffer | IDBArrayKey | IDBKeyRange): Promise<T> {
         const storage = await this.getTransaction('readonly') as IDBObjectStore;
 
-        return toPromise<Type>(storage.get(key));
+        return toPromise<T>(storage.get(key));
     }
 
-    async getAll(query?: string | number | Date | ArrayBufferView | ArrayBuffer | IDBArrayKey | IDBKeyRange, count?: number): Promise<Type[]> {
+    async getAll(query?: string | number | Date | ArrayBufferView | ArrayBuffer | IDBArrayKey | IDBKeyRange, count?: number): Promise<T[]> {
         const storage = await this.getTransaction('readonly') as IDBObjectStore;
 
-        return toPromise<Type[]>(storage.getAll(query, count));
+        return toPromise<T[]>(storage.getAll(query, count));
     }
 
     async getAllKeys(query?: string | number | Date | ArrayBufferView | ArrayBuffer | IDBArrayKey | IDBKeyRange, count?: number): Promise<IDBValidKey[]> {
@@ -46,7 +49,7 @@ export abstract class ObjectStore<Type = any> {
         return toPromise<IDBValidKey>(storage.getKey(query));
     }
 
-    iterate(range?: IDBValidKey | IDBKeyRange, direction?: IDBCursorDirection, readableOnly: boolean = false): AsyncGenerator<IDBCursorWithValue & { value: Type }, void, void> {
+    iterate(range?: IDBValidKey | IDBKeyRange, direction?: IDBCursorDirection, readableOnly: boolean = false): AsyncGenerator<IDBCursorWithValue & { value: T }, void, void> {
         const request = (this.getTransaction(readableOnly ? 'readonly' : 'readwrite') as Promise<IDBObjectStore>)
             .then(storage => storage.openCursor(range, direction))
 
@@ -94,6 +97,67 @@ export abstract class ObjectStore<Type = any> {
         const storage = await this.getTransaction('readonly') as IDBObjectStore;
 
         return toPromise<string[]>(Array.from(storage.indexNames));
+    }
+
+    private async * filter<C extends 'find' | 'update' | 'exclude'>(
+        command: C,
+        filter: filter<T>,
+        stopOnFirst: boolean,
+        data: C extends 'update' ? any : void
+    ): AsyncGenerator<C extends 'find' ? T : void, null, void> {
+        for await (const cursor of this.iterate())
+            if (
+                typeof filter === 'function' && filter(cursor.value) ||
+                typeof filter !== 'function' && include(filter, cursor.value)
+            ) {
+                switch (command) {
+                    case 'find':
+                        yield cursor.value;
+                        break;
+
+                    case 'update':
+                        yield void await toPromise(cursor.update(typeof data === 'function' ? data(cursor.value) : data));
+                        break;
+
+                    case 'exclude':
+                        yield void await toPromise(cursor.delete());
+                        break;
+                }
+
+                if (stopOnFirst)
+                    return null;
+            }
+
+        return null;
+    }
+
+    find(filter: filter<T>): AsyncGenerator<T, null, void> {
+        return this.filter('find', filter, false, null);
+    }
+
+    async findFirst(filter: filter<T>): Promise<T> {
+        for await (const result of this.filter('find', filter, true, null))
+            return result;
+    }
+
+    async update(filter: filter<T>, data: T | ((current: T) => T)): Promise<void> {
+        for await (const result of this.filter('update', filter, false, data))
+            ;
+    }
+
+    async updateFirst(filter: filter<T>, data: T | ((current: T) => T)): Promise<void> {
+        for await (const result of this.filter('update', filter, true, data))
+            ;
+    }
+
+    async exclude(filter: filter<T>): Promise<void> {
+        for await (const result of this.filter('exclude', filter, false, null))
+            ;
+    }
+
+    async excludeFirst(filter: filter<T>): Promise<void> {
+        for await (const result of this.filter('exclude', filter, true, null))
+            ;
     }
 
     protected updateDB(): Promise<void> {

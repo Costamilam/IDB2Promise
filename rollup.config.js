@@ -7,8 +7,7 @@ const type = process.env.BUILD;
 
 const outputFields = {
     name: 'IDB2Promise',
-    moduleName: 'IDB2Promise',
-    sourceMap: false,
+    sourcemap: false,
     exports: 'auto'
 };
 
@@ -22,7 +21,11 @@ const plugins = [
         tsconfigOverride: {
             compilerOptions: {
                 declaration: true,
-                declarationDir: './dist'
+                declarationDir: './dist',
+                lib: [
+                    'es2018',
+                    'webworker'
+                ]
             },
             include: [
                 'src/**/*.ts'

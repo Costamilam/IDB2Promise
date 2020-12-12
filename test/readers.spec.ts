@@ -25,7 +25,7 @@ describe('Data Readers:', () => {
     it('get', async () => {
         const item = await storage.get(0);
 
-        expect(JSON.stringify(item)).toEqual(JSON.stringify(data[0]));
+        expect(item).toEqual({ ...data[0] });
     });
 
     it('getAll', async () => {
@@ -36,7 +36,7 @@ describe('Data Readers:', () => {
         expect(all.length).toEqual(data.length);
 
         for (let i = 0; i < all.length; i++) {
-            expect(JSON.stringify(all[i])).toEqual(JSON.stringify(data[i]));
+            expect(all[i]).toEqual({ ...data[i] });
         }
     });
 
