@@ -1,8 +1,7 @@
 import { DemoOneObjectStore } from './demo-one-object-store';
-
 import { DemoOne } from './demo-one';
 
-describe('Testenting IndexedDB PendingStorage:', () => {
+describe('Data Writers:', () => {
     const storage = new DemoOneObjectStore();
 
     let data: DemoOne[] = [];
@@ -19,14 +18,14 @@ describe('Testenting IndexedDB PendingStorage:', () => {
         return Promise.all(data.map(storage.add.bind(storage)));
     });
 
-    it('add method increment pending list length', () => {
+    it('add', () => {
         return storage.add(new DemoOne('any'))
             .then(async () => {
                 expect(await storage.count()).toEqual(data.length + 1);
             });
     });
 
-    it('put method change pending list item', () => {
+    it('put', () => {
         const cahnged = new DemoOne('any');
 
         return storage.put(cahnged, 0)
@@ -35,14 +34,14 @@ describe('Testenting IndexedDB PendingStorage:', () => {
             });
     });
 
-    it('delete method remove pending list item', () => {
+    it('delete', () => {
         return storage.delete(0)
             .then(async () => {
                 expect(await storage.count()).toEqual(data.length - 1);
             });
     });
 
-    it('clear method clean pending list', () => {
+    it('clear', () => {
         return storage.clear()
             .then(async () => {
                 expect(await storage.count()).toEqual(0);

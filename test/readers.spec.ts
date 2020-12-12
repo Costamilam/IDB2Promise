@@ -1,9 +1,7 @@
 import { DemoOneObjectStore } from './demo-one-object-store';
-
 import { DemoOne } from './demo-one';
-import { AsyncCursor } from '../src/test';
 
-describe('Testenting IndexedDB PendingStorage:', () => {
+describe('Data Readers:', () => {
     const storage = new DemoOneObjectStore();
 
     let data: DemoOne[] = [];
@@ -20,17 +18,17 @@ describe('Testenting IndexedDB PendingStorage:', () => {
         return Promise.all(data.map(storage.add.bind(storage)));
     });
 
-    it('count method return pending list length', async () => {
+    it('count', async () => {
         expect(await storage.count()).toEqual(data.length);
     });
 
-    it('get method return a valid and complete pending item', async () => {
+    it('get', async () => {
         const item = await storage.get(0);
 
         expect(JSON.stringify(item)).toEqual(JSON.stringify(data[0]));
     });
 
-    it('getAll method return a valid and complete pending list', async () => {
+    it('getAll', async () => {
         const all = await storage.getAll();
 
         expect(all instanceof Array).toEqual(true);
@@ -42,13 +40,13 @@ describe('Testenting IndexedDB PendingStorage:', () => {
         }
     });
 
-    it('getKey method return a valid pending key', async () => {
+    it('getKey', async () => {
         const key = await storage.getKey(0);
 
         expect(key).toEqual(0);
     });
 
-    it('getAllKeys method return a valid and complete pending key list', async () => {
+    it('getAllKeys', async () => {
         const all = await storage.getAllKeys();
 
         expect(all instanceof Array).toEqual(true);
@@ -60,31 +58,25 @@ describe('Testenting IndexedDB PendingStorage:', () => {
         }
     });
 
-    it('iterator method return a valid and complete pending iterator', done => {
+    it('iterate', async () => {
         let length = 0;
 
-        const iterator = storage.iterate();
+        for await (const item of storage.iterate()) {
+            expect(item.value).toEqual({ ...data[length] });
 
-        iterator
-            .each(item => expect(JSON.stringify(item.value)).toEqual(JSON.stringify(data[length])))
-            .each(() => length++)
-            .finally(() => expect(length).toEqual(data.length))
-            .finally(done);
+            length++;
+        }
 
-        expect(iterator instanceof AsyncCursor).toEqual(true);
+        expect(length).toEqual(data.length);
     });
 
-    it('iteratorKeys method return a valid and complete pending key iterator', done => {
+    it('iterateKeys', async () => {
         let length = 0;
 
-        const iterator = storage.iterateKeys();
+        for await (const item of storage.iterateKeys()) {
+            expect(item.key).toEqual(length++);
+        }
 
-        iterator
-            .each(item => expect(item.key).toEqual(length))
-            .each(() => length++)
-            .finally(() => expect(length).toEqual(data.length))
-            .finally(done);
-
-        expect(iterator instanceof AsyncCursor).toEqual(true);
+        expect(length).toEqual(data.length);
     });
 });
