@@ -1,6 +1,6 @@
 {
     "name": "idb2promise",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "TypeScript library to manage IndexedDB Storage",
     "module": "./dist/idb2promise.es.js",
     "main": "./dist/idb2promise.cjs.js",

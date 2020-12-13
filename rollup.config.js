@@ -67,7 +67,7 @@ if (type === 'js') {
 }
 
 export default {
-    input: 'src/main.ts',
+    input: 'src/idb2promise.ts',
     output: output,
     plugins: plugins
 };

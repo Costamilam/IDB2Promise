@@ -1,4 +1,4 @@
-import { ObjectStore, IndexDefinition } from '../src/main';
+import { ObjectStore, IndexDefinition } from '../src/idb2promise';
 import { DemoOne } from './demo-one';
 
 export class DemoOneObjectStore extends ObjectStore<DemoOne> {
